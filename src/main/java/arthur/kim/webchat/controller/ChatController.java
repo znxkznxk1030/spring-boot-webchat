@@ -1,8 +1,9 @@
 package arthur.kim.webchat.controller;
 
-import arthur.kim.webchat.dto.ChatRoom;
-import arthur.kim.webchat.service.ChatService;
+import arthur.kim.webchat.pojo.ChatMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,15 +13,14 @@ import java.util.List;
 @RequestMapping("/chat")
 public class ChatController {
 
-    private final ChatService chatService;
+    private final SimpMessageSendingOperations messagingTemplate;
 
-    @PostMapping
-    public ChatRoom createRoom(@RequestParam String name) {
-        return chatService.createRoom(name);
-    }
-
-    @GetMapping
-    public List<ChatRoom> findAllRoom() {
-        return chatService.finalAllRoom();
+    @MessageMapping("/chat/message")
+    public void message(ChatMessage message) {
+        if (ChatMessage.MessageType.JOIN.equals(message.getType())) {
+            message.setMessage(message.getSender() + "님이 입장하셨습니다");
+        }
+        messagingTemplate.convertAndSend("/sub/chat/room/" + message.getRoomId(), message);
     }
 }
+
