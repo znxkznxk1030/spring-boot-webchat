@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import http from "../../http";
 import "../style-chat-room.css";
+import { Link } from "react-router-dom";
 
 const ChatRoomList = () => {
   const [chatRoomList, setChatRoomList] = useState([]);
@@ -20,7 +21,9 @@ const ChatRoomList = () => {
   async function handleSubmit(event) {
     event.preventDefault();
     if (roomName.trim().length < 4) {
-      alert(" Too short for room name ! ( need more than 4 characters except for blank spaces)");
+      alert(
+        " Too short for room name ! ( need more than 4 characters except for blank spaces)"
+      );
       return;
     }
     await createChatRoom();
@@ -54,14 +57,14 @@ const ChatRoomList = () => {
       </form>
 
       <div className="chat-room-list">
-        {chatRoomList.map((item, index) => (
-          <div key={index}>
+        {chatRoomList.map((room, index) => (
+          <Link key={index} to="/room" state={{ roomId: room.roomId }}>
             <div className="item__data">
-              <div className="item__names">{item.name}</div>
+              <div className="item__names">{room.name}</div>
               <div className="item__btn_detail"></div>
               <div className="item__bar"></div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
