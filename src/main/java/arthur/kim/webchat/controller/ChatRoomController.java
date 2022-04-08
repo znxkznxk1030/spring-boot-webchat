@@ -14,11 +14,13 @@ import java.util.List;
 @RequestMapping("/chat")
 public class ChatRoomController {
 
+    public static final String CHAT_ROOMDETAIL = "/chat/roomdetail";
+    public static final String CHAT_ROOM = "/chat/room";
     private final ChatRoomRepository chatRoomRepository;
 
     @GetMapping("/room")
     public String rooms(Model model) {
-        return "/chat/room";
+        return CHAT_ROOM;
     }
 
     @GetMapping("/rooms")
@@ -36,7 +38,7 @@ public class ChatRoomController {
     @GetMapping("/room/enter/{roomId}")
     public String roomDetail(Model model, @PathVariable String roomId) {
         model.addAttribute("roomId", roomId);
-        return "/chat/roomdetail";
+        return CHAT_ROOMDETAIL;
     }
 
     @GetMapping("/room/{roomId}")
