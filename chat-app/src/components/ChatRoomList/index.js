@@ -7,13 +7,34 @@ const ChatRoomList = () => {
   const [roomName, setRoomName] = useState("");
 
   useEffect(() => {
+    loadChatRoomList();
+  }, []);
+
+  function loadChatRoomList() {
     http.get("/chat/rooms").then(({ data: _chatRoomList }) => {
       setChatRoomList(_chatRoomList);
       console.log(_chatRoomList);
     });
-  }, []);
+  }
 
-  function handleSubmit() {}
+  async function handleSubmit(event) {
+    event.preventDefault();
+    if (roomName.trim().length < 4) {
+      alert(" Too short for room name ! ( need more than 4 characters except for blank spaces)");
+      return;
+    }
+    await createChatRoom();
+    loadChatRoomList();
+    setRoomName("");
+  }
+
+  function createChatRoom() {
+    const payload = {
+      name: roomName,
+    };
+
+    return http.post("/chat/room", null, { params: payload });
+  }
 
   return (
     <div className="chat-room-wrapper">
@@ -21,7 +42,6 @@ const ChatRoomList = () => {
         <h1>Chat Room List</h1>
       </div>
 
-      
       <form className="chat-room_form" onSubmit={handleSubmit}>
         <input
           className="title_input"
@@ -44,7 +64,6 @@ const ChatRoomList = () => {
           </div>
         ))}
       </div>
-
     </div>
   );
 };
