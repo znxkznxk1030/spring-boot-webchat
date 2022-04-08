@@ -3,7 +3,7 @@
 
 :root {
   --main-color: #50cb93;
-  --given-color:  #d0b134;
+  --given-color: #d0b134;
 }
 
 .chat-room-wrapper {
@@ -11,7 +11,6 @@
   font-size: 1rem;
   height: 85vh;
 }
-
 
 .chat-room-list {
   max-height: 70vh;
@@ -37,6 +36,19 @@
   color: #0e2431;
   margin-bottom: 1rem;
   transition: transform 0.2s ease-out;
+
+  user-select: none;
+
+  /* 브라우저 의존성 명시 */
+  -ms-user-select: none;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+}
+
+.item__data:hover {
+  background-color: #50cb93;
+  cursor: pointer;
 }
 
 .item__bar {
@@ -73,7 +85,7 @@
   border-color: var(--given-color);
 }
 
-.item__bar_given{
+.item__bar_given {
   height: 8px;
   background: var(--given-color);
 }
@@ -127,6 +139,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  user-select: none;
+
+  /* 브라우저 의존성 명시 */
+  -ms-user-select: none;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
 }
 
 .chat-room-header > img {
@@ -138,4 +157,47 @@
 .chat-room-header > h1 {
   margin-top: 30px;
   margin-left: 5px;
+}
+
+/* Form */
+
+.chat-room_form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 50px;
+
+  user-select: none;
+
+  /* 브라우저 의존성 명시 */
+  -ms-user-select: none;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+}
+
+.title_input {
+  height: 40px;
+  width: 400px;
+  font-family: "Do Hyeon", sans-serif;
+  font-size: 25px;
+  transition: all 0.2s ease-in-out;
+}
+
+/* .title_input:focus {
+  width: 60vw;
+  transition:all .2s ease-in-out;
+} */
+
+.submit_input {
+  display: block;
+  border: none;
+  background-color: #50cb93;
+  width: 65px;
+  height: 65px;
+  border-radius: 50px;
+  margin-left: -25px;
+  color: azure;
+  font-size: 55px;
+  cursor: pointer;
 }
