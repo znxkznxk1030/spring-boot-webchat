@@ -58,7 +58,7 @@ const ChatRoomList = () => {
 
       <div className="chat-room-list">
         {chatRoomList.map((room, index) => (
-          <Link key={index} to="/room" state={{ roomId: room.roomId }}>
+          <Link key={index} to="/room" state={{ room }}>
             <div className="item__data">
               <div className="item__names">{room.name}</div>
               <div className="item__btn_detail"></div>

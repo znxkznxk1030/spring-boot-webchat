@@ -1,62 +1,67 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import * as StompJs from "@stomp/stompjs";
+import Stomp from "stompjs";
 import * as SockJS from "sockjs-client";
 
 const ChatRoom = () => {
-  const [roomId, setRoomId] = useState(null);
   const [sender, setSender] = useState(null);
-  const [message, setMessage] = useState(null);
-  const client = useRef(null);
-
+  const [messageList, setMessageList] = useState(null);
+  const [message, setMessage] = useState("");
   const location = useLocation();
 
+  const room = location.state.room;
+
+  const sock = new SockJS("http://localhost:8080/ws-stomp");
+  const client = Stomp.over(sock);
+
   useEffect(() => {
-    setRoomId(location.state?.roomId);
-    console.log(roomId);
-    connect();
+    client.connect({}, () => {
+      client.subscribe(`/sub/chat/room/${room.roomId}`, (res) => {
+        console.log(res);
+        console.log(messageList);
+        const msg = JSON.parse(res.body);
 
-    return () => {
-      disconnect();
-    };
-  }, [location.state?.roomId, roomId]);
+        if (messageList == null) {
+          setMessageList([msg]);
+        } else {
+          console.log([...messageList, msg]);
+          setMessageList((msgList) => [...msgList, msg]);
+        }
+      });
 
-  function connect() {
-    client.current = new StompJs.Client({
-      // brokerURL: "ws://localhost:8080/ws-stomp", // 웹소켓 서버로 직접 접속
-      webSocketFactory: () => new SockJS("/ws-stomp"), // proxy를 통한 접속
-      connectHeaders: {},
-      debug: console.log,
-      reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-      onConnect: subscribe,
-      onStompError: console.error,
+      client.send(
+        `/pub/chat/message`,
+        {},
+        JSON.stringify({
+          type: "JOIN",
+          roomId: room.roomId,
+          sender: "test-001",
+          message: "test message",
+        })
+      );
     });
 
-    client.current.activate();
+    return () => client.disconnect();
+  }, []);
+
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    client.send(
+      `/pub/chat/message`,
+      {},
+      JSON.stringify({
+        type: "TALK",
+        roomId: room.roomId,
+        sender: "test-001",
+        message,
+      })
+    );
+
+    setMessage("");
   }
 
-  function disconnect() {
-    client.current.deactivate();
-  }
-
-  function subscribe() {
-    setMessage([]);
-    client.current.subscribe(`/sub/chat/room/${roomId}`, ({ body }) => {
-      console.log("message : " + body);
-      setMessage((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-    });
-  }
-
-  function publish() {
-    client.current.publish(`/pub/chat/room/${roomId}`, {
-      sender: "test-sender",
-      message: "test-message",
-    });
-  }
-
-  if (!roomId || !message) {
+  if (!messageList) {
     return (
       <div className="chat-room-wrapper">
         <div className="chat-room-header">
@@ -73,19 +78,29 @@ const ChatRoom = () => {
   return (
     <div className="chat-room-wrapper">
       <div className="chat-room-header">
-        <h1>Chat Room List</h1>
+        <h1>{`채팅방: ${room.name}`}</h1>
       </div>
 
       <div className="chat-room-list">
-        {message.map((msg, index) => (
+        {messageList.map((msg, index) => (
           <div key={index}>
             <div className="item__data">
-              <div className="item__names">{msg.name}</div>
+              <div className="item__names">{msg.message}</div>
               <div className="item__btn_detail"></div>
             </div>
           </div>
         ))}
       </div>
+
+      <form className="chat-room_form" onSubmit={handleSubmit}>
+        <input
+          className="title_input"
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+        <input type="submit" value="+" className="submit_input"></input>
+      </form>
     </div>
   );
 };
