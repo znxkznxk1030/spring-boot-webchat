@@ -5,7 +5,7 @@ import * as SockJS from "sockjs-client";
 
 const ChatRoom = () => {
   const [sender, setSender] = useState(null);
-  const [messageList, setMessageList] = useState(null);
+  const [messageList, setMessageList] = useState([]);
   const [message, setMessage] = useState("");
   const location = useLocation();
 

@@ -2,10 +2,14 @@ import React, { useState, useEffect } from "react";
 import http from "../../http";
 import "../style-chat-room.css";
 import { Link } from "react-router-dom";
+import ReactModal from "react-modal";
 
 const ChatRoomList = () => {
   const [chatRoomList, setChatRoomList] = useState([]);
   const [roomName, setRoomName] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     loadChatRoomList();
@@ -39,6 +43,15 @@ const ChatRoomList = () => {
     return http.post("/chat/room", null, { params: payload });
   }
 
+  function handleOpenModal(room) {
+    setSelectedRoom((_room) => room);
+    setShowModal(true);
+  }
+
+  function handleCloseModal() {
+    setShowModal(false);
+  }
+
   return (
     <div className="chat-room-wrapper">
       <div className="chat-room-header">
@@ -58,15 +71,39 @@ const ChatRoomList = () => {
 
       <div className="chat-room-list">
         {chatRoomList.map((room, index) => (
-          <Link key={index} to="/room" state={{ room }}>
-            <div className="item__data">
-              <div className="item__names">{room.name}</div>
-              <div className="item__btn_detail"></div>
-              <div className="item__bar"></div>
-            </div>
-          </Link>
+          <div
+            key={room.roomId}
+            className="item__data"
+            onClick={(e) => handleOpenModal(room)}
+          >
+            <div className="item__names">{room.name}</div>
+            <div className="item__btn_detail"></div>
+            <div className="item__bar"></div>
+          </div>
         ))}
       </div>
+      <ReactModal
+        isOpen={showModal}
+        contentLabel="onRequestClose Example"
+        onRequestClose={handleCloseModal}
+        className="Modal"
+        overlayClassName="Overlay"
+        appElement={document.getElementById("root") || undefined}
+      >
+        <form className="chat-room_form">
+          <input
+            className="title_input"
+            type="text"
+            placeholder={`사용할 이름`}
+            value={roomName}
+            onChange={(e) => setUser(e.target.value)}
+          />
+        </form>
+        <Link to="/room" state={{ room: selectedRoom, user: user }}>
+          Enter to ChatRoom
+        </Link>
+        <button onClick={handleCloseModal}>Close Modal</button>
+      </ReactModal>
     </div>
   );
 };
