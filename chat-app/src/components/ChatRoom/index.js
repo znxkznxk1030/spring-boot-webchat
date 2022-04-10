@@ -4,12 +4,12 @@ import Stomp from "stompjs";
 import * as SockJS from "sockjs-client";
 
 const ChatRoom = () => {
-  const [sender, setSender] = useState(null);
   const [messageList, setMessageList] = useState([]);
   const [message, setMessage] = useState("");
   const location = useLocation();
 
-  const room = location.state.room;
+  const room = location.state?.room;
+  const sender = location.state?.user || "Anonymous";
 
   const sock = new SockJS("http://localhost:8080/ws-stomp");
   const client = Stomp.over(sock);
@@ -35,7 +35,7 @@ const ChatRoom = () => {
         JSON.stringify({
           type: "JOIN",
           roomId: room.roomId,
-          sender: "test-001",
+          sender,
           message: "test message",
         })
       );

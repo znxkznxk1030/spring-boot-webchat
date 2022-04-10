@@ -9,7 +9,7 @@ const ChatRoomList = () => {
   const [roomName, setRoomName] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState("");
 
   useEffect(() => {
     loadChatRoomList();
@@ -90,19 +90,26 @@ const ChatRoomList = () => {
         overlayClassName="Overlay"
         appElement={document.getElementById("root") || undefined}
       >
-        <form className="chat-room_form">
-          <input
-            className="title_input"
-            type="text"
-            placeholder={`사용할 이름`}
-            value={roomName}
-            onChange={(e) => setUser(e.target.value)}
-          />
-        </form>
-        <Link to="/room" state={{ room: selectedRoom, user: user }}>
-          Enter to ChatRoom
-        </Link>
-        <button onClick={handleCloseModal}>Close Modal</button>
+        <div className="modal-wrapper">
+          <div className="modal-header">
+            <h2> {`${selectedRoom?.name} | 대화명 입력`}</h2>
+          </div>
+          <div className="modal-body">
+            <input
+              className="modal-name-input"
+              type="text"
+              placeholder={`대화명을 입력해주세요`}
+              value={user}
+              onChange={(e) => setUser(e.target.value)}
+            />
+          </div>
+          <div className="modal-footer">
+            <Link to="/room" state={{ room: selectedRoom, user: user }}>
+              Enter
+            </Link>
+            <button onClick={handleCloseModal}>Close</button>
+          </div>
+        </div>
       </ReactModal>
     </div>
   );
