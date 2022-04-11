@@ -53,7 +53,7 @@ const ChatRoom = () => {
       JSON.stringify({
         type: "TALK",
         roomId: room.roomId,
-        sender: "test-001",
+        sender,
         message,
       })
     );
@@ -85,7 +85,7 @@ const ChatRoom = () => {
         {messageList.map((msg, index) => (
           <div key={index}>
             <div className="item__data">
-              <div className="item__names">{msg.message}</div>
+              <div className="item__names">{`${msg.sender} - ${msg.message}`}</div>
               <div className="item__btn_detail"></div>
             </div>
           </div>
