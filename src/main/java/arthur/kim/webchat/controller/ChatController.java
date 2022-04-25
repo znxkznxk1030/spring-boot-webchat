@@ -10,7 +10,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/chat")
+@CrossOrigin("*")
 public class ChatController {
 
     private final SimpMessageSendingOperations messagingTemplate;
@@ -18,7 +18,7 @@ public class ChatController {
     @MessageMapping("/chat/message")
     public void message(ChatMessage message) {
         if (ChatMessage.MessageType.JOIN.equals(message.getType())) {
-            message.setMessage(message.getSender() + "님이 입장하셨습니다");
+            message.setMessage("님이 입장하셨습니다");
         }
         messagingTemplate.convertAndSend("/sub/chat/room/" + message.getRoomId(), message);
     }

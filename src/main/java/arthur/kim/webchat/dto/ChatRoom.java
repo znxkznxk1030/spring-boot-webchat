@@ -9,14 +9,13 @@ public class ChatRoom {
     private String roomId;
     private String name;
 
-    @Builder
     public ChatRoom(String roomId, String name) {
         this.roomId = roomId;
         this.name = name;
     }
 
     public ChatRoom(String name) {
-        ChatRoom.builder().roomId(UUID.randomUUID().toString()).name(name);
+        this(UUID.randomUUID().toString(), name);
     }
 
     public static ChatRoom create(String name) {

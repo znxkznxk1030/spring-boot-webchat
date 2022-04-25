@@ -12,6 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/chat")
+@CrossOrigin("*")
 public class ChatRoomController {
 
     public static final String CHAT_ROOMDETAIL = "/chat/roomdetail";

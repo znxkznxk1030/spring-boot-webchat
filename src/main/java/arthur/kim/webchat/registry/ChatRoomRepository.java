@@ -18,10 +18,9 @@ public class ChatRoomRepository {
     }
 
     public List<ChatRoom> findAllRoom() {
-        return new ArrayList<>(chatRoomMap.values())
-                .stream()
-                .sorted(Collections.reverseOrder())
-                .collect(Collectors.toList());
+        List<ChatRoom> chatRoomList = new ArrayList<>(chatRoomMap.values());
+        Collections.reverse(chatRoomList);
+        return chatRoomList;
     }
 
     public ChatRoom findRoomById(String id) {
