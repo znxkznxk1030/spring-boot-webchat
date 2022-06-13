@@ -1,6 +1,7 @@
 package arthur.kim.webchat.registry;
 
 import arthur.kim.webchat.dto.ChatRoom;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
@@ -30,5 +31,11 @@ public class ChatRoomRepository {
     public ChatRoom createChatRoom(String name) {
         ChatRoom chatRoom = new ChatRoom(name);
         return chatRoomMap.put(chatRoom.getRoomId(), chatRoom);
+    }
+
+    public void enterChatRoom(String roomId) {
+    }
+
+    public ChannelTopic getTopic(String roomId) {
     }
 }
