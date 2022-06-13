@@ -49,6 +49,20 @@ Redis를 사용하기 위해서는 RedisTemplate 이나 RedisRepository를 이�
 
 #### sendAndConvert
 
+#### Redis Hash Type으로 사용하기 ( opsForHash )
+
+```java
+private HashOperations<String, String, ChatRoom> opsHashChatRoom = redisTemplate.opsForHash();
+Map<String, Object> topics = new HashMap<>();
+
+
+
+```
+
+### RedisMessageListenerContainer
+
+- Redis를 보고있다가 메시지 발행 (publish)가 되면 Listener가 처리
+
 ## Reference
 
 - [Spring Boot Redis 사용 방법 (RedisTemplate, RedisRepository)](https://wildeveloperetrain.tistory.com/32)
