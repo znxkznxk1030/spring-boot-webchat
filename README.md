@@ -36,6 +36,43 @@ spring:
       nodes: # host: 포트 쌍 목록 ( 콤마로 구분 )
 ```
 
+### Local 환경에서 Embedded Redis 설정
+
+local 환경에서는 별도의 Redis 서버없이, 서버가 켜짐과 동시에 서버에서 내장 Redis 서버도 실행하도록 해준다
+
+```java
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import redis.embedded.RedisServer;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+@Profile("local")
+@Configuration
+public class EmbeddedRedisConfig {
+
+    @Value("${spring.redis.port}")
+    private int redisPort;
+
+    private RedisServer redisServer;
+
+    @PostConstruct
+    public void redisServer() {
+        redisServer = new RedisServer(redisPort);
+        redisServer.start();
+    }
+
+    @PreDestroy
+    public void stopRedis() {
+        if (redisServer != null) {
+            redisServer.stop();
+        }
+    }
+}
+```
+
 ### RedisTemplate 를 이용한 사용법
 
 Redis를 사용하기 위해서는 RedisTemplate 이나 RedisRepository를 이용하여 사용한다.
