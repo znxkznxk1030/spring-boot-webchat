@@ -55,8 +55,6 @@ Redis를 사용하기 위해서는 RedisTemplate 이나 RedisRepository를 이�
 private HashOperations<String, String, ChatRoom> opsHashChatRoom = redisTemplate.opsForHash();
 Map<String, Object> topics = new HashMap<>();
 
-
-
 ```
 
 ### RedisMessageListenerContainer
