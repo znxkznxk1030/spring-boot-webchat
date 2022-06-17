@@ -16,7 +16,8 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 ## Redis
 
-### Redis 의 옵션
+
+### properties 설정
 
 ```yml
 spring:
@@ -72,6 +73,42 @@ public class EmbeddedRedisConfig {
     }
 }
 ```
+
+### Redis Config 설정
+
+```java
+@Configuration
+public class RedisConfig {
+
+    /**
+     * redis pub/sub 메시지를 처리하는 listener 설정
+     */
+    @Bean
+    public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        return container;
+    }
+
+    /**
+     * 어플리케이션에서 사용할 redisTemplate 설정
+     */
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(connectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
+        return redisTemplate;
+    }
+}
+```
+
+### RedisConnctionFactory
+
+- RedisConnectionFactory를 지원하는 라이브러리는 jedis와 lettuce가 있다.
+- 단, jedis는 thread-safe하지 않기때문에 jedis-pool을 사용해야한다. 그렇기에 lettuce를 더 많이 사용한다.
+- lettuce는 비동기 이벤트 프레임워크인 Netty를 기반으로 만들어진 Redis 클라이언트이다.
 
 ### RedisTemplate 를 이용한 사용법
 
