@@ -16,7 +16,6 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 ## Redis
 
-
 ### properties 설정
 
 ```yml
@@ -109,6 +108,89 @@ public class RedisConfig {
 - RedisConnectionFactory를 지원하는 라이브러리는 jedis와 lettuce가 있다.
 - 단, jedis는 thread-safe하지 않기때문에 jedis-pool을 사용해야한다. 그렇기에 lettuce를 더 많이 사용한다.
 - lettuce는 비동기 이벤트 프레임워크인 Netty를 기반으로 만들어진 Redis 클라이언트이다.
+
+#### RedisMessageListenerContainer 이내부적으로 ConnectionFactory를 사용하는 법
+
+```java
+connection = connectionFactory.getConnection();
+if (connection.isSubscribed()) {
+ throw new IllegalStateException("Retrieved connection is already subscribed; aborting listening");
+}
+
+boolean asyncConnection = ConnectionUtils.isAsync(connectionFactory);
+
+// NB: sync drivers' Xsubscribe calls block, so we notify the RDMLC before performing the actualsubscription.
+if (!asyncConnection) {
+ synchronized (monitor) {
+  monitor.notify();
+ }
+}
+
+SubscriptionPresentCondition subscriptionPresent = eventuallyPerformSubscription();
+
+if (asyncConnection) {
+ SpinBarrier.waitFor(subscriptionPresent, getMaxSubscriptionRegistrationWaitingTime());
+ synchronized (monitor) {
+  monitor.notify();
+ }
+}
+```
+
+### Redis 를 이용하여 Pub/Sub 기능 구현하기
+
+#### Publisher 구현하기
+
+RedisTemplate 의 convertAndSend 메서드를 통해 메시지를 발행한다.
+이때 Redis 스프링 라이브러리에서 구현된 ChannelTopic와 개인적으로 구현한 ChatMessage를 인자로 주면,
+해당 토픽에 메세지가 발행된다.
+
+```java
+@RequiredArgsConstructor
+@Service
+public class RedisPublisher {
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    public void publish(ChannelTopic topic, ChatMessage message) {
+        redisTemplate.convertAndSend(topic.getTopic(), message);
+    }
+}
+```
+
+#### Subscriber 구현하기
+
+Publisher는 별도의 인터페이스 없이 구현한 것에 반해, Subscriber는 Redis 스프링 라이브러리에 있는 MessageListener 인터페이스를 구현해야한다.
+MessageListener에 있는 onMessage는 Publisher에서 발행시 지정한 토픽일 경우 발현된다.
+onMessage에 인자로 오는 Message는 Redis에 저장된 날것의 String값이므로, RedisTemplate을 이용하여 읽을 수 있는 객체 형태 (ChatMessage)로 가공한다.
+구독된 메세지를 웹으로 보내기 위해 SimpMessageSendingOperations를 이용하여 Message를 발행했다. 이는 레디스의 pub/sub과 별개의 기능이다.
+
+```java
+@Slf4j
+@RequiredArgsConstructor
+@Service
+public class RedisSubscriber implements MessageListener {
+
+    private final ObjectMapper objectMapper;
+    private final SimpMessageSendingOperations messagingTemplate;
+    private final RedisSerializer<String> redisSerializer;
+
+    /**
+     * Redis에서 메세지가 publish되면 구독하고 있던 onMessage가 해당 메세지를 처리한다.
+     *
+     * @param message
+     * @param pattern
+     */
+    @Override
+    public void onMessage(Message message, byte[] pattern) {
+        try {
+            ChatMessage roomMessage = objectMapper.readValue(redisSerializer.deserialize(message.getBody()), ChatMessage.class);
+            messagingTemplate.convertAndSend("/sub/chat/room/" + roomMessage.getRoomId(), roomMessage);
+        } catch (JsonProcessingException e) {
+            log.debug(e.getMessage());
+        }
+    }
+}
+```
+
 
 ### RedisTemplate 를 이용한 사용법
 
