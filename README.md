@@ -1,6 +1,16 @@
-# Spring-Boot Web Chat Using Redis
+# Redis를 이용한 WebChat 만들기
 
 Followed by [spring-websocket-chatting](https://daddyprogrammer.org/post/4077/spring-websocket-chatting/) by [Daddy Programmer](https://daddyprogrammer.org/)
+
+## Demo
+
+### 방 만들기
+
+![방 만들기](./figures/create-room.gif)
+
+### 채팅하기
+
+![채팅 하기](./figures/chat-001.gif)
 
 ## Run
 
