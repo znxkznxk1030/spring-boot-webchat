@@ -48,7 +48,7 @@ spring:
 
 ### Local 환경에서 Embedded Redis 설정
 
-local 환경에서는 별도의 Redis 서버없이, 서버가 켜짐과 동시에 서버에서 내장 Redis 서버도 실행하도록 해준다
+local 환경에서는 별도의 Redis없이, 내장 Redis 서버도 실행하도록 해준다
 
 ```java
 import org.springframework.beans.factory.annotation.Value;
